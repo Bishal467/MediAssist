@@ -1,4 +1,4 @@
-// static/script.js
+
 const chatBox = document.getElementById('chat-box');
 const input   = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
@@ -8,10 +8,8 @@ function appendMessage(text, sender) {
   msg.classList.add('message', sender);
 
   if (sender === 'bot') {
-    // text contains HTML (safe-sanitized below)
     msg.innerHTML = text;
   } else {
-    // user text must remain plain text
     msg.textContent = text;
   }
 
@@ -19,11 +17,7 @@ function appendMessage(text, sender) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-/**
- * sanitizeHTML - light sanitizer: allow only a small whitelist of tags,
- * and strip attributes. This avoids loading external libs while preventing
- * most injection risks.
- */
+
 function sanitizeHTML(dirty) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(dirty, 'text/html');
@@ -54,12 +48,6 @@ function sanitizeHTML(dirty) {
   return doc.body.innerHTML;
 }
 
-/**
- * appendMessageLetterByLetter - append bot message **letter by letter**
- * while preserving HTML tags (<br>, <b>, etc.)
- * safeHTML: sanitized HTML string
- * speed: milliseconds per character
- */
 function appendMessageLetterByLetter(safeHTML, speed = 40) {
   const botMsg = document.createElement('div');
   botMsg.classList.add('message', 'bot');
@@ -71,7 +59,6 @@ function appendMessageLetterByLetter(safeHTML, speed = 40) {
 
   const interval = setInterval(() => {
     if (i < safeHTML.length) {
-      // Handle HTML tags: append the whole tag at once
       if (safeHTML[i] === '<') {
         const tagEnd = safeHTML.indexOf('>', i);
         if (tagEnd !== -1) {
@@ -82,7 +69,6 @@ function appendMessageLetterByLetter(safeHTML, speed = 40) {
           i++;
         }
       } else {
-        // Normal character
         currentHTML += safeHTML[i];
         i++;
       }
@@ -95,7 +81,6 @@ function appendMessageLetterByLetter(safeHTML, speed = 40) {
   }, speed);
 }
 
-/** sendMessage: main flow */
 async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
@@ -129,7 +114,6 @@ async function sendMessage() {
       data = { reply: txt };
     }
 
-    // support several possible keys
     let replyRaw = '';
     if (typeof data === 'string') replyRaw = data;
     else if (data.reply) replyRaw = data.reply;
@@ -137,14 +121,11 @@ async function sendMessage() {
     else if (data.message) replyRaw = data.message;
     else replyRaw = JSON.stringify(data);
 
-    // convert newlines to <br>
     replyRaw = String(replyRaw).replace(/\r\n/g, '\n').replace(/\n/g, '<br>');
 
-    // sanitize but keep allowed tags
     const safe = sanitizeHTML(replyRaw);
 
-    // Append bot message letter by letter
-    appendMessageLetterByLetter(safe, 40); // 40ms per character
+    appendMessageLetterByLetter(safe, 40);
 
   } catch (err) {
     console.error('Fetch error:', err);

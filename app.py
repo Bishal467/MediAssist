@@ -12,7 +12,6 @@ app.secret_key = "supersecret"
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# ------------------ Load Data (unchanged) ------------------
 training = pd.read_csv('Data/Training.csv')
 testing = pd.read_csv('Data/Testing.csv')
 training.columns = training.columns.str.replace(r"\.\d+$", "", regex=True)
@@ -28,7 +27,6 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random
 model = RandomForestClassifier(n_estimators=300, random_state=42)
 model.fit(x_train, y_train)
 
-# Dictionaries
 severityDictionary, description_list, precautionDictionary = {}, {}, {}
 symptoms_dict = {symptom: idx for idx, symptom in enumerate(x)}
 
@@ -93,7 +91,6 @@ quotes = [
     "🌺 Remember, self-care is not selfish."
 ]
 
-# ------------------ Routes ------------------
 
 @app.route('/')
 def login_page():
@@ -169,12 +166,9 @@ def chat():
     elif step == 'final':
         return final_prediction()
 
-    # --- RESTART LOGIC ---
     elif step == 'restart_check':
         if user_msg == 'yes':
-            # Restart from Symptom Description (Step 4)
             session['step'] = 'symptoms'
-            # Clear previous symptoms but keep demographic info (name, age, gender)
             session['symptoms'] = []
             return jsonify(reply="Okay! Let's address your other concerns.\n👉 Please describe your symptoms in a sentence:")
         elif user_msg == 'no':
@@ -184,7 +178,6 @@ def chat():
             return jsonify(reply="Please answer with 'yes' or 'no'.")
 
     elif step == 'ended':
-        # If user types anything after "No", start from the absolute beginning
         session.clear()
         session['step'] = 'name'
         return jsonify(reply="Restarting session...\n🤖 Welcome to HealthCare ChatBot!\n👉 What is your name?")
@@ -213,13 +206,11 @@ def final_prediction():
     text += "\n\n\n💡 " + random.choice(quotes)
     text += f"\n\n\nThank you for using the chatbot, {session.get('name', 'User')}!"
     
-    # Set up the restart question
     session['step'] = 'restart_check'
     text += "\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n❓ **Do you have furthermore questions? (yes/no)**"
     
     return jsonify(reply=text)
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True) 
+
