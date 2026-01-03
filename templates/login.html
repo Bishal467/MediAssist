@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HealthCare Login/Register</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
+
+</head>
+<body>
+  <div class="container">
+    <!-- Login Form -->
+    <div id="loginForm" class="form active">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
+      <button id="loginBtn">Login</button>
+      <p style="text-align:center">
+  <a href="#" id="forgotPassword">Forgot Password?</a>
+</p>
+
+      <p>Not registered? <a href="#" id="goRegister">Register here</a></p>
+      <p id="loginMsg" class="msg"></p>
+    </div>
+
+    <!-- Register Form -->
+    <div id="registerForm" class="form">
+      <h2>Register</h2>
+      <input type="text" id="regName" placeholder="Full Name" required>
+      <input type="number" id="regAge" placeholder="Age" required>
+      <label for="regGender">Gender</label>
+      <select id="regGender" name="regGender" aria-required="true">
+        <option value="" disabled selected>Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <input type="text" id="regProfession" placeholder="Profession" required>
+      <input type="email" id="regEmail" placeholder="Email" required>
+      <input type="password" id="regPassword" placeholder="Password" required>
+      <button id="registerBtn">Register</button>
+      <p>Already registered? <a href="#" id="goLogin">Login here</a></p>
+      <p id="registerMsg" class="msg"></p>
+    </div>
+  </div>
+
+
+  <script type="module" src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>
