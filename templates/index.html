@@ -6,10 +6,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <!-- Phone-like chat container -->
   <div class="phone-frame">
-    <div class="chat-header">MediAssist</div>
+
+    <div class="chat-header" style="display:flex; justify-content:space-between; align-items:center;">
+      <span>MediAssist</span>
+      <button id="logout-btn">Logout</button>
+    </div>
+
     <div id="chat-box" class="chat-box"></div>
+
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Type your symptoms..." autocomplete="off">
       <button id="send-btn">➤</button>

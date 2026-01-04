@@ -148,3 +148,38 @@ body {
     transform: translateY(0);
   }
 }
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: #4CAF50;   /* nice green header */
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 15px 15px 0 0; /* rounded top corners */
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* Logout button styling */
+#logout-btn {
+    background-color: #ffffff;    /* white button */
+    color: #4CAF50;               /* green text */
+    border: none;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#logout-btn:hover {
+    background-color: #e6e6e6;
+    transform: scale(1.05);
+}
+
+#logout-btn:active {
+    transform: scale(0.95);
+}

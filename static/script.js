@@ -1,4 +1,4 @@
-/* ================= FIREBASE ADDITIONS ================= */
+
 import { auth, db } from "./js/firebase.js";
 import {
   collection,
@@ -8,6 +8,7 @@ import {
   getDocs,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
 
 let currentUser = null;
 
@@ -17,11 +18,12 @@ auth.onAuthStateChanged(user => {
     loadChatHistory();
   }
 });
-/* ===================================================== */
+
 
 const chatBox = document.getElementById('chat-box');
 const input   = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
+
 
 function appendMessage(text, sender) {
   const msg = document.createElement('div');
@@ -37,7 +39,7 @@ function appendMessage(text, sender) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-/* ================= FIREBASE SAVE ================= */
+
 async function saveMessage(sender, message) {
   if (!currentUser) return;
 
@@ -66,7 +68,7 @@ async function loadChatHistory() {
     appendMessage(chat.message, chat.sender);
   });
 }
-/* ================================================= */
+
 
 function sanitizeHTML(dirty) {
   const parser = new DOMParser();
@@ -136,7 +138,7 @@ async function sendMessage() {
   if (!text) return;
 
   appendMessage(text, 'user');
-  await saveMessage("user", text);   // 🔥 added
+  await saveMessage("user", text);
   input.value = '';
 
   console.log('→ Sending to /chat:', text);
@@ -177,7 +179,7 @@ async function sendMessage() {
     const safe = sanitizeHTML(replyRaw);
 
     appendMessageLetterByLetter(safe, 40);
-    await saveMessage("bot", safe.replace(/<br>/g, '\n'));  // 🔥 added
+    await saveMessage("bot", safe.replace(/<br>/g, '\n'));
 
   } catch (err) {
     console.error('Fetch error:', err);
@@ -187,3 +189,18 @@ async function sendMessage() {
 
 sendBtn.addEventListener('click', sendMessage);
 input.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+
+
+const logoutBtn = document.getElementById('logout-btn');
+logoutBtn.addEventListener('click', async () => {
+    if (!currentUser) return;
+    try {
+        await signOut(auth);
+        currentUser = null;
+        chatBox.innerHTML = "";    
+        window.location.href = "/"; 
+    } catch(err) {
+        console.error("Logout failed:", err);
+        appendMessage("⚠️ Logout failed. Check console.", "bot");
+    }
+});
