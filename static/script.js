@@ -1,3 +1,23 @@
+/* ================= FIREBASE ADDITIONS ================= */
+import { auth, db } from "./js/firebase.js";
+import {
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  getDocs,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+let currentUser = null;
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    loadChatHistory();
+  }
+});
+/* ===================================================== */
 
 const chatBox = document.getElementById('chat-box');
 const input   = document.getElementById('user-input');
@@ -17,6 +37,36 @@ function appendMessage(text, sender) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+/* ================= FIREBASE SAVE ================= */
+async function saveMessage(sender, message) {
+  if (!currentUser) return;
+
+  await addDoc(
+    collection(db, "users", currentUser.uid, "chats"),
+    {
+      sender: sender,
+      message: message,
+      timestamp: serverTimestamp()
+    }
+  );
+}
+
+async function loadChatHistory() {
+  chatBox.innerHTML = "";
+
+  const q = query(
+    collection(db, "users", currentUser.uid, "chats"),
+    orderBy("timestamp")
+  );
+
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(doc => {
+    const chat = doc.data();
+    appendMessage(chat.message, chat.sender);
+  });
+}
+/* ================================================= */
 
 function sanitizeHTML(dirty) {
   const parser = new DOMParser();
@@ -86,6 +136,7 @@ async function sendMessage() {
   if (!text) return;
 
   appendMessage(text, 'user');
+  await saveMessage("user", text);   // 🔥 added
   input.value = '';
 
   console.log('→ Sending to /chat:', text);
@@ -98,7 +149,7 @@ async function sendMessage() {
     });
 
     if (!res.ok) {
-      const t = await res.text().catch(()=>'');
+      const t = await res.text().catch(()=> '');
       console.error('Network response not ok', res.status, t);
       appendMessage('⚠️ Server returned status ' + res.status, 'bot');
       return;
@@ -126,6 +177,7 @@ async function sendMessage() {
     const safe = sanitizeHTML(replyRaw);
 
     appendMessageLetterByLetter(safe, 40);
+    await saveMessage("bot", safe.replace(/<br>/g, '\n'));  // 🔥 added
 
   } catch (err) {
     console.error('Fetch error:', err);
